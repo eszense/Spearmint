@@ -184,7 +184,7 @@
 
 
 import numpy as np
-import kernel_utils
+from .kernel_utils import dist2, grad_dist2
 
 from .abstract_kernel import AbstractKernel
 from ..utils          import priors
@@ -220,7 +220,7 @@ class Matern52(AbstractKernel):
         return np.ones(inputs.shape[0])
 
     def cross_cov(self, inputs_1, inputs_2):
-        r2  = np.abs(kernel_utils.dist2(self.ls.value, inputs_1, inputs_2))
+        r2  = np.abs(dist2(self.ls.value, inputs_1, inputs_2))
         r   = np.sqrt(r2)
         cov = (1.0 + SQRT_5*r + (5.0/3.0)*r2) * np.exp(-SQRT_5*r)
 
@@ -229,9 +229,9 @@ class Matern52(AbstractKernel):
     def cross_cov_grad_data(self, inputs_1, inputs_2):
         # NOTE: This is the gradient wrt the inputs of inputs_2
         # The gradient wrt the inputs of inputs_1 is -1 times this
-        r2      = np.abs(kernel_utils.dist2(self.ls.value, inputs_1, inputs_2))
+        r2      = np.abs(dist2(self.ls.value, inputs_1, inputs_2))
         r       = np.sqrt(r2)
         grad_r2 = (5.0/6.0)*np.exp(-SQRT_5*r)*(1 + SQRT_5*r)
 
-        return grad_r2[:,:,np.newaxis] * kernel_utils.grad_dist2(self.ls.value, inputs_1, inputs_2)
+        return grad_r2[:,:,np.newaxis] * grad_dist2(self.ls.value, inputs_1, inputs_2)
 

@@ -185,10 +185,11 @@
 import numpy        as np
 import numpy.random as npr
 
-from nose.tools import assert_raises
-
+from spearmint.tests import assert_raises
 from spearmint.transformations                         import Transformer, BetaWarp, Normalization, Linear
 from spearmint.transformations.abstract_transformation import AbstractTransformation
+
+from six.moves import xrange
 
 class SimpleTransformation(AbstractTransformation):
     def __init__(self, num_dims):
@@ -405,5 +406,5 @@ def test_add_layer():
 
     output_inds = t.add_layer(st3)
     assert len(t.layer_transformations) == 2
-    assert output_inds == range(10)
+    assert output_inds == list(range(10))
 

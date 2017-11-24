@@ -271,7 +271,7 @@ def launch(db_address, experiment_name, job_id):
         import traceback
         traceback.print_exc()
         sys.stderr.write("Problem executing the function\n")
-        print sys.exc_info()
+        print(sys.exc_info())
         
     end_time = time.time()
 

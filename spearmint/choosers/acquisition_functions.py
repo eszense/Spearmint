@@ -191,7 +191,7 @@ import numpy.random   as npr
 import scipy.linalg   as spla
 import scipy.stats    as sps
 import scipy.optimize as spo
-import cPickle
+import pickle as cPickle
 import multiprocessing
 import ast
 

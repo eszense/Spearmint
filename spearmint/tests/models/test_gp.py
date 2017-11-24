@@ -187,6 +187,8 @@ import numpy.random as npr
 
 from spearmint.models import GP
 
+from six.moves import xrange
+
 def test_gp_init():
     gp = GP(5)
 

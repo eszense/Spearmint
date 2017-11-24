@@ -192,6 +192,7 @@ from .mcmc             import slice_sample
 from .abstract_sampler import AbstractSampler
 from ..utils           import param as hyperparameter_utils
 
+from six.moves import xrange
 
 class SliceSampler(AbstractSampler):
     """generate samples from a model using slice sampling
@@ -228,9 +229,9 @@ class SliceSampler(AbstractSampler):
             lp += param.prior_logprob()
 
             if np.isnan(lp): # Positive infinity should be ok, right?
-                print 'Param diagnostics:'
+                print('Param diagnostics:')
                 param.print_diagnostics()
-                print 'Prior logprob: %f' % param.prior_logprob()
+                print('Prior logprob: %f' % param.prior_logprob())
                 raise Exception("Prior returned %f logprob" % lp)
 
         if not np.isfinite(lp):
@@ -282,13 +283,13 @@ if __name__ == '__main__':
 
     for i in xrange(n):
         if i % 1000 == 0:
-            print 'Sample %d/%d' % (i,n)
+            print('Sample %d/%d' % (i,n))
 
         x, cur_ll = slice_sample(x, gsn. logprob)
         x_samples[i] = x.copy()
 
-    print '1D Gaussian actual mean: %f, mean of samples: %f' % (-1, np.mean(x_samples))
-    print '1D Gaussian actual sigma: %f, std of samples: %f' % (4, np.std(x_samples))
+    print('1D Gaussian actual mean: %f, mean of samples: %f' % (-1, np.mean(x_samples)))
+    print('1D Gaussian actual sigma: %f, std of samples: %f' % (4, np.std(x_samples)))
 
 
     plt.figure(1)
@@ -307,19 +308,19 @@ if __name__ == '__main__':
 
     for i in xrange(n):
         if i % 1000 == 0:
-            print 'Sample %d/%d' % (i,n)
+            print('Sample %d/%d' % (i,n))
 
         x, cur_ll = slice_sample(x, mvn.logprob)
         x_samples[:,i] = x.copy()
 
     mu_samp = np.mean(x_samples,axis=1)
-    print '2D Gaussian:'
-    print 'Actual mean:     [%f,%f]' % (mu[0], mu[1])
-    print 'Mean of samples: [%f,%f]' % (mu_samp[0], mu_samp[1])
-    print 'Actual Cov:'
-    print str(cov)
-    print 'Cov of samples'
-    print str(np.cov(x_samples))
+    print('2D Gaussian:')
+    print('Actual mean:     [%f,%f]' % (mu[0], mu[1]))
+    print('Mean of samples: [%f,%f]' % (mu_samp[0], mu_samp[1]))
+    print('Actual Cov:')
+    print(str(cov))
+    print('Cov of samples')
+    print(str(np.cov(x_samples)))
 
     # plt.figure(1)
     # plt.clf()

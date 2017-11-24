@@ -187,6 +187,9 @@ import numpy as np
 from collections          import OrderedDict
 from spearmint.tasks.task import Task
 
+from six.moves import xrange
+from six import iteritems
+
 def create_task():
     task_name = "mytask"
     task_type = "OBJECTIVE"
@@ -211,7 +214,7 @@ def create_task():
     # Create a set of inputs that satisfies the constraints of each variable
     X = np.zeros((10,num_dims))
     for i in xrange(10):
-        for name, variable in variables_meta.iteritems():
+        for name, variable in iteritems(variables_meta):
             indices = variable['indices']
             if variable['type'] == 'int':
                 X[i,indices] = np.random.randint(variable['min'], variable['max']+1, len(indices))
@@ -224,7 +227,9 @@ def create_task():
 
     y = np.random.randn(10)
 
-    t = Task(task_name, task_type, variables_config, data=X, values=y)
+    t = Task(task_name, {'type':task_type}, variables_config)
+    t.inputs = X
+    t.values = y
 
     return t
 
@@ -242,7 +247,9 @@ def test_standardization():
     ymean = y.mean()
     ystd = y.std()
 
-    ystandard = t.standardized_values
+    ystandard = t.values
+    ystandard = t.standardize_mean(ystandard)
+    ystandard = t.standardize_variance(ystandard)
 
     assert np.all(ystandard == (y - ymean) / ystd)
     assert np.abs(ystandard.mean()) < 1e-15
@@ -251,9 +258,9 @@ def test_standardization():
 def test_unit():
     t = create_task()
 
-    U = t.unit_data
+    U = t.to_unit(t.inputs)
     V = t.from_unit(U)
 
     assert np.all(U <= 1) and np.all(U >= 0)
-    assert np.linalg.norm(V - t.data) < 1e-10
+    assert np.linalg.norm(V - t.inputs) < 1e-10
 

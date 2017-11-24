@@ -272,7 +272,7 @@ class DefaultChooser(object):
 
         hypers = hypers if hypers is not None else defaultdict(dict)
 
-        # print 'Fittings tasks: %s' % str(task_group.tasks.keys())
+        # print('Fittings tasks: %s' % str(task_group.tasks.keys()))
 
         for task_name, task in task_group.tasks.iteritems():
             if task.type.lower() == 'objective':
@@ -327,9 +327,9 @@ class DefaultChooser(object):
             self.task_group.paramify_and_print(suggestion.flatten(), left_indent=16)
             return suggestion
 
-        # print 'inputs: %s' % self.objective['inputs']
+        # print('inputs: %s' % self.objective['inputs'])
         # if self.objective.has_key('pending'):
-            # print 'pending: %s' % self.objective['pending']
+            # print('pending: %s' % self.objective['pending'])
 
         # Compute the current best
         current_best, current_best_location = self.best()
@@ -351,7 +351,7 @@ class DefaultChooser(object):
         best_grid_ei  = grid_ei[best_grid_ind]
         
         if VERBOSE:
-            print 'Best EI before optimization: %f' % best_grid_ei
+            print('Best EI before optimization: %f' % best_grid_ei)
 
         if self.check_grad:
             check_grad(lambda x: self.acq_optimize_wrapper(x, current_best, True), 
@@ -387,8 +387,8 @@ class DefaultChooser(object):
         # Optimization should always be better unless the optimization
         # breaks in some way.
         if VERBOSE:
-            print 'Best EI after  optimization: %f' % best_opt_ei
-            print 'Suggested input %s' % cand[best_opt_ind]
+            print('Best EI after  optimization: %f' % best_opt_ei)
+            print('Suggested input %s' % cand[best_opt_ind])
 
         if best_opt_ei >= best_grid_ei:
             suggestion = cand[best_opt_ind]

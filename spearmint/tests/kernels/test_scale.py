@@ -187,6 +187,8 @@ import numpy.random as npr
 
 from spearmint.kernels import Matern52, Scale
 
+from six.moves import xrange
+
 def test_grad():
     npr.seed(1)
 

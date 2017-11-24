@@ -187,13 +187,16 @@ import sys
 import numpy as np
 from collections import OrderedDict
 
+from six import iteritems
+from six.moves import xrange
 
 class BaseTask(object):
     """
     Contains useful methods for a task to inherit.
     """
 
-    def variables_config_to_meta(self, variables_config):
+    @staticmethod
+    def variables_config_to_meta(variables_config):
         """
         Converts a dict of variable meta-information from a config-file format into
         a format that can be more easily used by bayesopt routines.
@@ -207,7 +210,7 @@ class BaseTask(object):
         cardinality    = 0 # The number of distinct variables
         num_dims       = 0 # The number of dimensions in the matrix representation
 
-        for name, variable in variables_config.iteritems():
+        for name, variable in iteritems(variables_config):
             cardinality += variable['size']
             vdict = {'type'    : variable['type'].lower(),
                      'indices' : []} # indices stores a mapping from these variable(s) to their matrix column(s)
@@ -318,7 +321,7 @@ class BaseTask(object):
             squeeze = False
 
         U = np.zeros(V.shape)
-        for name, variable in self.variables_meta.iteritems():
+        for name, variable in iteritems(self.variables_meta):
             indices = variable['indices']
             if variable['type'] == 'int':
                 vals = V[:,indices]
@@ -348,7 +351,7 @@ class BaseTask(object):
             squeeze = False
 
         V = np.zeros(U.shape)
-        for name, variable in self.variables_meta.iteritems():
+        for name, variable in iteritems(self.variables_meta):
             indices = variable['indices']
             if variable['type'] == 'int':
                 vals = U[:,indices]

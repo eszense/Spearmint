@@ -187,8 +187,7 @@ import warnings
 import numpy        as np
 import numpy.random as npr
 
-from nose.tools import assert_raises
-
+from spearmint.tests import assert_raises
 from spearmint.transformations import BetaWarp
 from spearmint.utils           import priors
 from spearmint.utils.param     import Param as Hyperparameter
@@ -228,7 +227,7 @@ def test_forward_pass():
 
     data = 0.5*np.ones(D)
 
-    assert np.all(bw.forward_pass(data) == 0.1161165235168156)
+    assert np.all(np.isclose(bw.forward_pass(data), 0.1161165235168156))
 
 def test_backward_pass():
     npr.seed(1)

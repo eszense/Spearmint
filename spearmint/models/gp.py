@@ -196,12 +196,15 @@ from ..sampling.slice_sampler import SliceSampler
 from ..utils                  import priors
 from ..transformations        import BetaWarp, Transformer
 
+from six.moves import xrange
+from six import iteritems
+
 try:
     module = sys.modules['__main__'].__file__
     log    = logging.getLogger(module)
 except:
     log    = logging.getLogger()
-    print 'Not running from main.'
+    print('Not running from main.')
 
 DEFAULT_MCMC_ITERS = 10
 DEFAULT_BURNIN     = 100
@@ -274,7 +277,7 @@ class GP(AbstractModel):
             self.noiseless = False
 
     def _set_params_from_dict(self, hypers_dict):
-        for name, hyper in self.params.iteritems():
+        for name, hyper in iteritems(self.params):
             self.params[name].value = hypers_dict[name]
 
     def _reset_params(self):
@@ -463,7 +466,7 @@ class GP(AbstractModel):
     def to_dict(self):
         """return a dictionary that saves the values of the hypers and the chain length"""
         gp_dict = {'hypers' : {}}
-        for name, hyper in self.params.iteritems():
+        for name, hyper in iteritems(self.params):
             gp_dict['hypers'][name] = hyper.value
 
         gp_dict['chain length'] = self.chain_length

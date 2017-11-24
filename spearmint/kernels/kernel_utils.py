@@ -184,8 +184,9 @@
 
 
 import numpy as np
-import scipy.weave
+# import scipy.weave
 from scipy.spatial.distance import cdist
+from six.moves import xrange
 
 def dist2(ls, x1, x2=None):
     # Assumes NxD and MxD matrices.

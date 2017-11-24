@@ -183,7 +183,9 @@
 # its Institution.
 
 import numpy as np
-import cPickle as pickle
+import pickle
+
+from six.moves import xrange
 
 # Numba autojit might be nice.  Currently asplodes.
 def sobol(num_points, num_dims):
@@ -236,11 +238,11 @@ def sobol(num_points, num_dims):
     return Z
 
 def to_binary(X, bits):
-    return 1 & (X[:,np.newaxis]/2**np.arange(bits-1,-1,-1, dtype=np.uint32))
+    return 1 & (X[:,np.newaxis]//2**np.arange(bits-1,-1,-1, dtype=np.uint32))
 
 # These are the parameters for the Sobol sequence.
 # This is hilarious.
-params = """(lp1
+params = b"""(lp1
 (dp2
 S'a'
 I0

@@ -191,6 +191,8 @@ from spearmint.transformations import Linear
 from spearmint.utils           import priors
 from spearmint.utils.param     import Param as Hyperparameter
 
+from six.moves import xrange
+
 def test_backward_pass():
     npr.seed(1)
 

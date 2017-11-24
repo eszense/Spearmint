@@ -191,7 +191,7 @@ import scipy.linalg      as spla
 import scipy.optimize    as spo
 import scipy.io          as sio
 import scipy.stats       as sps
-import scipy.weave
+# import scipy.weave
 
 
 from .gp                                     import GP
@@ -203,12 +203,15 @@ from ..sampling.elliptical_slice_sampler     import EllipticalSliceSampler
 from ..utils                                 import priors
 from ..transformations                       import BetaWarp, Transformer
 
+from six.moves import xrange
+from six import iteritems
+
 try:
     module = sys.modules['__main__'].__file__
     log    = logging.getLogger(module)
 except:
     log = logging.getLogger()
-    print 'Not running from main.'
+    print('Not running from main.')
 
 class GPClassifier(GP):
     def __init__(self, num_dims, **options):
@@ -476,7 +479,7 @@ class GPClassifier(GP):
         gp_dict = {}
 
         gp_dict['hypers'] = {}
-        for name, hyper in self.params.iteritems():
+        for name, hyper in iteritems(self.params):
             gp_dict['hypers'][name] = hyper.value
 
         # Save the latent values as a dict with keys as hashes of the data

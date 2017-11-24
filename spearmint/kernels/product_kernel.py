@@ -186,6 +186,7 @@
 import numpy as np
 
 from .abstract_kernel import AbstractKernel
+from six.moves import reduce
 
 
 class ProductKernel(AbstractKernel):

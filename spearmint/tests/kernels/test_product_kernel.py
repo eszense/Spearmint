@@ -187,6 +187,8 @@ import numpy.random as npr
 
 from spearmint.kernels import Matern52, ProductKernel
 
+from six.moves import xrange
+
 def test_product_kernel_grad():
     npr.seed(1)
 

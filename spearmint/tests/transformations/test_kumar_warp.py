@@ -187,8 +187,7 @@ import warnings
 import numpy        as np
 import numpy.random as npr
 
-from nose.tools import assert_raises
-
+from spearmint.tests import assert_raises
 from spearmint.transformations import KumarWarp
 from spearmint.utils           import priors
 from spearmint.utils.param     import Param as Hyperparameter

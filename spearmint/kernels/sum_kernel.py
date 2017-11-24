@@ -185,6 +185,7 @@
 
 from .abstract_kernel import AbstractKernel
 
+from six.moves import reduce
 
 class SumKernel(AbstractKernel):
     def __init__(self, *kernels):
