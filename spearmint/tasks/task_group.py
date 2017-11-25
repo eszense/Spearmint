@@ -190,6 +190,7 @@ from collections import OrderedDict
 
 from .task import Task
 
+from six import iteritems
 
 class TaskGroup(object):
     """
@@ -203,7 +204,7 @@ class TaskGroup(object):
     
     def __init__(self, tasks_config, variables_config):
         self.tasks = {}
-        for task_name, task_options in tasks_config.iteritems():
+        for task_name, task_options in iteritems(tasks_config):
             self.tasks[task_name] = Task(task_name,
                                          task_options,
                                          variables_config)
@@ -245,7 +246,7 @@ class TaskGroup(object):
     @property
     def values(self):
         """return a dictionary of the task values keyed by task name"""
-        return {task_name : task.values for task_name, task in self.tasks.iteritems()}
+        return {task_name : task.values for task_name, task in iteritems(self.tasks)}
 
     @values.setter
     def values(self, values):

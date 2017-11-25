@@ -197,6 +197,9 @@ from ..grids                 import sobol_grid
 from ..models.abstract_model import function_over_hypers
 from ..                      import models
 
+from six import iteritems
+from six.moves import reduce, xrange
+
 DEFAULT_GRIDSIZE  = 20000
 DEFAULT_GRIDSEED  = 0
 DEFAULT_NUMDESIGN = 2
@@ -223,6 +226,8 @@ class DefaultChooser(object):
         ?
     """
     def __init__(self, options):
+        self.quiet = options.get('quiet', True)
+
         self.grid_size = options.get('grid_size', DEFAULT_GRIDSIZE)
         self.grid_seed = options.get('grid_seed', DEFAULT_GRIDSEED)
         self.num_spray = options.get('num-spray', DEFAULT_NUMSPRAY)
@@ -260,7 +265,7 @@ class DefaultChooser(object):
                                         grid_seed=self.grid_seed)
 
         # A useful hack: add previously visited points to the grid
-        for task_name, task in task_group.tasks.iteritems():
+        for task_name, task in iteritems(task_group.tasks):
             if task.has_valid_inputs():
                 self.grid = np.append(self.grid, task.valid_normalized_data_dict['inputs'], axis=0)
             if task.has_pending():
@@ -274,7 +279,7 @@ class DefaultChooser(object):
 
         # print('Fittings tasks: %s' % str(task_group.tasks.keys()))
 
-        for task_name, task in task_group.tasks.iteritems():
+        for task_name, task in iteritems(task_group.tasks):
             if task.type.lower() == 'objective':
                 data_dict = self.objective # confusing: this is how self.objective gets populated
             elif task.type.lower() == 'constraint':
@@ -299,9 +304,10 @@ class DefaultChooser(object):
 
                 self.models[task_name] = getattr(models, model_class)(task_group.num_dims, **task.options)
 
-                vals = data_dict['values'] if data_dict.has_key('values') else data_dict['counts']
+                vals = data_dict['values'] if 'values' in data_dict else data_dict['counts']
 
-                sys.stderr.write('Fitting %s for %s task...\n' % (model_class, task_name))
+                if not self.quiet:
+                    sys.stderr.write('Fitting %s for %s task...\n' % (model_class, task_name))
                 new_hypers[task_name] = self.models[task_name].fit(
                     data_dict['inputs'],
                     vals,
@@ -314,7 +320,8 @@ class DefaultChooser(object):
         return new_hypers
 
     def suggest(self):
-        sys.stderr.write('Getting suggestion...\n')
+        if not self.quiet:
+            sys.stderr.write('Getting suggestion...\n')
         assert not np.any(self.grid < 0)
         assert not np.any(self.grid > 1)
 
@@ -323,8 +330,9 @@ class DefaultChooser(object):
 
         if self.objective['inputs'].shape[0] < DEFAULT_NUMDESIGN:
             suggestion = self.task_group.from_unit(self.grid[self.design_index])
-            sys.stderr.write("\nSuggestion:     ")
-            self.task_group.paramify_and_print(suggestion.flatten(), left_indent=16)
+            if not self.quiet:
+                sys.stderr.write("\nSuggestion:     ")
+                self.task_group.paramify_and_print(suggestion.flatten(), left_indent=16)
             return suggestion
 
         # print('inputs: %s' % self.objective['inputs'])
@@ -401,8 +409,9 @@ class DefaultChooser(object):
 
         suggestion = self.task_group.from_unit(suggestion)
 
-        sys.stderr.write("\nSuggestion:     ")
-        self.task_group.paramify_and_print(suggestion.flatten(), left_indent=16)
+        if not self.quiet:
+            sys.stderr.write("\nSuggestion:     ")
+            self.task_group.paramify_and_print(suggestion.flatten(), left_indent=16)
         return suggestion
 
     # TODO: add optimization in here
@@ -427,9 +436,10 @@ class DefaultChooser(object):
             unnormalized_std_at_best = obj_task.unstandardize_variance(std_at_best)
 
             # Print out the minimum according to the model
-            sys.stderr.write('\nMinimum expected objective value under model '
-                'is %.5f (+/- %.5f), at location:\n' % (unnormalized_best_value, unnormalized_std_at_best))
-            self.task_group.paramify_and_print(self.task_group.from_unit(current_best_location).flatten(), 
+            if not self.quiet:
+                sys.stderr.write('\nMinimum expected objective value under model '
+                    'is %.5f (+/- %.5f), at location:\n' % (unnormalized_best_value, unnormalized_std_at_best))
+                self.task_group.paramify_and_print(self.task_group.from_unit(current_best_location).flatten(),
                                                left_indent=16, indent_top_row=True)
 
             # Compute the best value seen so far
@@ -439,8 +449,9 @@ class DefaultChooser(object):
             best_observed_location = inps[np.argmin(vals),:][None]
 
             # Don't need to un-normalize inputs here because these are the raw inputs
-            sys.stderr.write('\nMinimum of observed values is %f, at location:\n' % best_observed_value)
-            self.task_group.paramify_and_print(best_observed_location.flatten(), left_indent=16, indent_top_row=True)
+            if not self.quiet:
+                sys.stderr.write('\nMinimum of observed values is %f, at location:\n' % best_observed_value)
+                self.task_group.paramify_and_print(best_observed_location.flatten(), left_indent=16, indent_top_row=True)
 
         else:
 
@@ -453,11 +464,12 @@ class DefaultChooser(object):
                 best_probs_location = grid[best_probs_ind,:][None]
                 # TODO -- could use BFGS for this (unconstrained) optimization as well -- everytime for min of mean
 
-                sys.stderr.write('\nNo feasible region found (yet).\n')
-                sys.stderr.write('Maximum probability of satisfying constraints = %f\n' % np.max(probs))
-                sys.stderr.write('At location:    ')
-                self.task_group.paramify_and_print(self.task_group.from_unit(best_probs_location).flatten(), 
-                                                   left_indent=16)
+                if not self.quiet:
+                    sys.stderr.write('\nNo feasible region found (yet).\n')
+                    sys.stderr.write('Maximum probability of satisfying constraints = %f\n' % np.max(probs))
+                    sys.stderr.write('At location:    ')
+                    self.task_group.paramify_and_print(self.task_group.from_unit(best_probs_location).flatten(),
+                                                       left_indent=16)
                 
                 return None, best_probs_location
 
@@ -479,15 +491,17 @@ class DefaultChooser(object):
             # this is the variance at that location, not the standard deviation of the minimum... 
             # not sure if this distinction is a big deal
 
-            sys.stderr.write('\nMinimum expected objective value satisfying constraints w/ high prob: %f\n' % unnormalized_best)
-            sys.stderr.write('At location:    ')
-            self.task_group.paramify_and_print(self.task_group.from_unit(current_best_location).flatten(), left_indent=16)
+            if not self.quiet:
+                sys.stderr.write('\nMinimum expected objective value satisfying constraints w/ high prob: %f\n' % unnormalized_best)
+                sys.stderr.write('At location:    ')
+                self.task_group.paramify_and_print(self.task_group.from_unit(current_best_location).flatten(), left_indent=16)
 
             # Compute the best value seen so far
             with np.errstate(invalid='ignore'):
                 all_constraints_satisfied = np.all(np.greater(np.array([x.values for x in self.task_group.tasks.values()]), 0), axis=0)
             if not np.any(all_constraints_satisfied):
-                sys.stderr.write('No observed result satisfied all constraints.\n')
+                if not self.quiet:
+                    sys.stderr.write('No observed result satisfied all constraints.\n')
             else:
                 inps = self.task_group.inputs
                 vals = self.task_group.values[self.objective['name']]
@@ -498,8 +512,9 @@ class DefaultChooser(object):
                 best_observed_value = np.min(vals)
                 best_observed_location = inps[np.argmin(vals),:][None]
                 # Don't need to un-normalize inputs here because these are the raw inputs
-                sys.stderr.write('\nBest observed values satisfying constraints is %f, at location:\n' % best_observed_value)
-                self.task_group.paramify_and_print(best_observed_location.flatten(), left_indent=16, indent_top_row=True)
+                if not self.quiet:
+                    sys.stderr.write('\nBest observed values satisfying constraints is %f, at location:\n' % best_observed_value)
+                    self.task_group.paramify_and_print(best_observed_location.flatten(), left_indent=16, indent_top_row=True)
 
 
         # Return according to model, not observed

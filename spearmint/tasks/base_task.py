@@ -253,7 +253,7 @@ class BaseTask(object):
         sys.stderr.write(indentation)
         sys.stderr.write('----          ----       -----\n')
 
-        for param_name, param in params.iteritems():
+        for param_name, param in iteritems(params):
 
             if param['type'] == 'float':
                 format_str = '%s%-12.12s  %-9.9s  %-12f\n'
@@ -276,7 +276,7 @@ class BaseTask(object):
             raise Exception('Input to paramify must be a 1-D array.')
 
         params = {}
-        for name, vdict in self.variables_meta.iteritems():
+        for name, vdict in iteritems(self.variables_meta):
             indices = vdict['indices']
             params[name] = {}
             params[name]['type'] = vdict['type']
@@ -295,7 +295,7 @@ class BaseTask(object):
     # Converts a dict of params to the corresponding vector in puts space
     def vectorify(self, params):
         v = np.zeros(self.num_dims)
-        for name, param in params.iteritems():
+        for name, param in iteritems(params):
             indices = self.variables_meta[name]['indices']
 
             if param['type'] == 'int' or param['type'] == 'float':

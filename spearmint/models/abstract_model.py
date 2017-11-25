@@ -186,6 +186,8 @@ import numpy        as np
 
 from abc import ABCMeta, abstractmethod
 
+from six.moves import reduce, xrange
+
 class AbstractModel(object):
     __metaclass__ = ABCMeta
 
